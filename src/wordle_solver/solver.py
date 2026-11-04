@@ -71,7 +71,6 @@ class WordleSolver:
     @staticmethod
     def _should_add_candidate(candidate: str, restrictions: dict[str, LetterRestriction]) -> bool:
         for (letter, restriction) in restrictions.items():
-            print(candidate, letter, restriction, candidate.count(letter))
             c_count = candidate.count(letter)
             if c_count > restriction.max_count or c_count < restriction.min_count:
                 return False
