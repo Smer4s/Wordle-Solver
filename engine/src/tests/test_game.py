@@ -1,21 +1,22 @@
-from contextlib import nullcontext as does_not_raise
 import pytest
-from ..wordle.game import WordleGame, GameStatus, GuessResult, GameEndedError
+from ..wordle.game import WordleGame, GameStatus, GameEndedError
 from random import choice
-from engine.main import MAX_ATTEMPTS, WORDS_PATH, read_words
+from engine.main import MAX_ATTEMPTS
+
+TEST_WORDS = {"crane", "slate", "apple", "grape"}
 
 
 @pytest.fixture
 def get_game() -> WordleGame:
-    allowed_words = read_words(WORDS_PATH)
+    allowed_words = TEST_WORDS
     return WordleGame(allowed_words, max_attempts=MAX_ATTEMPTS)
 
 
 def get_wrong_guess(game: WordleGame) -> str:
-    wrong_guess: str = choice(list(game.allowed_words))
+    wrong_guess: str = choice(list(game.get_allowed_words()))
     answer = game.get_answer()
     while wrong_guess == answer:
-        wrong_guess = choice(list(game.allowed_words))
+        wrong_guess = choice(list(game.get_allowed_words()))
 
     return wrong_guess
 
@@ -41,10 +42,8 @@ def test_loss_at_six_attempts(get_game):
 def test_invalid_guess_does_not_consume_attempt(get_game):
     initial = get_game.get_attempts()
     wrong_word = 'ab123'
-    try:    
+    with pytest.raises(ValueError):
         get_game.submit_guess(wrong_word)
-    except ValueError:
-        pass
     
     assert initial == get_game.get_attempts()
     
@@ -83,10 +82,10 @@ def test_try_after_game_end(get_game):
 
 
 def test_change_word_set():
-    allowed_words = read_words(WORDS_PATH)
+    allowed_words = TEST_WORDS
     game = WordleGame(allowed_words, max_attempts=MAX_ATTEMPTS)
     word: str = 'aaaaa'
     allowed_words.add(word)
 
-    assert len(allowed_words) == len(game.allowed_words) + 1
-    assert word not in game.allowed_words
+    assert len(allowed_words) == len(game.get_allowed_words()) + 1
+    assert word not in game.get_allowed_words()

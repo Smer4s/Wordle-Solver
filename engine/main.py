@@ -17,13 +17,12 @@ def main():
         guess = input(f'Guess #{current_attempt}: ')
         try:
             result = game.submit_guess(guess)
+            print('Feedback:', result.feedback)
             if game.get_status() != GameStatus.IN_PROGRESS:
                 if game.get_status() == GameStatus.WON:
                     print('You WON in', current_attempt, 'attempts!')
                 else:
                     print('You LOST. The WORD was:', game.get_answer())
-                break
-            print('Feedback:', result.feedback)
         except ValueError as e:
             msg = ' '.join([str(arg) for arg in e.args])
             print(f'ERROR: {msg}')

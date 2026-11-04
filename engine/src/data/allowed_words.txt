@@ -3,7 +3,7 @@ abaft
 abase
 abash
 abate
-abbés
+abbes
 abbey
 abbot
 abeam
@@ -41,7 +41,7 @@ adder
 addle
 adept
 adieu
-adiós
+adios
 adman
 admen
 admin
@@ -453,7 +453,7 @@ blanc
 bland
 blank
 blare
-blasé
+blase
 blast
 blats
 blaze
@@ -683,7 +683,7 @@ caddy
 cadet
 cadge
 cadre
-cafés
+cafes
 caged
 cager
 cages
@@ -1417,7 +1417,7 @@ eaves
 ebbed
 ebony
 echos
-éclat
+eclat
 ecrus
 edema
 edged
@@ -1477,7 +1477,7 @@ ensue
 enter
 entry
 envoy
-épées
+epees
 epics
 epoch
 epoxy
@@ -1498,7 +1498,7 @@ ether
 ethic
 ethos
 ethyl
-étude
+etude
 euros
 evade
 evens
@@ -1915,7 +1915,7 @@ gists
 given
 giver
 gives
-glacé
+glace
 glade
 glads
 gland
@@ -2528,7 +2528,7 @@ kraal
 kraft
 kraut
 krill
-króna
+krona
 krone
 kudos
 kudzu
@@ -2878,7 +2878,7 @@ medic
 meeds
 meets
 melds
-melée
+melee
 melon
 melts
 memes
@@ -3273,7 +3273,7 @@ outdo
 outed
 outer
 outgo
-outré
+outre
 ouzos
 ovals
 ovary
@@ -3344,7 +3344,7 @@ parts
 party
 pases
 pasha
-passé
+passe
 pasta
 paste
 pasts
@@ -3917,7 +3917,7 @@ rotas
 roted
 rotes
 rotor
-roués
+roues
 rouge
 rough
 round
@@ -4016,7 +4016,7 @@ satyr
 sauce
 saucy
 sauna
-sauté
+saute
 saved
 saver
 saves

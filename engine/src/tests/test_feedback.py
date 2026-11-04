@@ -21,9 +21,7 @@ from engine.src.wordle.feedback import get_feedback
                                                    ("aaaaa", "aaaab",
                                                     (2, 2, 2, 2, 0)),
                                                    ("abcde", "fghij",
-                                                    (0, 0, 0, 0, 0)),
-                                                   ("CRANE", "crane",
-                                                    (2, 2, 2, 2, 2))])
+                                                    (0, 0, 0, 0, 0))])
 def test_feedback(answer, guess, expected):
     assert get_feedback(answer, guess) == expected
 

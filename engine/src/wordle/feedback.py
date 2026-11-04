@@ -15,13 +15,13 @@ def get_feedback(answer: str, guess: str, allowed_words: set[str] = ()) -> tuple
         ValueError: if the input format is invalid.
     """
 
-    guess = guess.lower()
-    answer = answer.lower()
     validate(guess, allowed_words)
     validate(answer, allowed_words)
 
     return compare(answer, guess)
 
+def normalize(word: str) -> str:
+    return word.lower()
 
 def compare(answer: str, guess: str) -> tuple[int, ...]:
     idx: dict[int, int] = {i: 0 for i in range(len(guess))}
@@ -55,6 +55,8 @@ def compare(answer: str, guess: str) -> tuple[int, ...]:
 def validate(word: str, allowed_words: set[str] = ()) -> None:
     if word.isalpha() is False:
         raise ValueError(f'Word: {word} contains not only letters')
+    if normalize(word) != word:
+        raise ValueError(f'Word: {word} is not normalized')
     if is_latin(word) is False:
         raise ValueError(f'Word: {word} contains not only latin letters')
     if len(word) != 5:
