@@ -24,6 +24,8 @@ class WordleSolver:
         """
         Initialize solver with all possible answers.
         """
+        if type(possible_answers) != set:
+            raise ValueError('Expected possible_answers to be set type')
         if len(possible_answers) == 0:
             raise ValueError('possible_answers must not be empty')
         for answer in possible_answers:
@@ -43,14 +45,17 @@ class WordleSolver:
         WordleSolver._validate_feedback(feedback)
         restrictions = self._get_restrictions(guess, feedback)
         self._apply_restrictions(restrictions)
-        print(self._candidates)
         
     @staticmethod
     def _validate_feedback(feedback: tuple[int,...]) -> None:
+        if type(feedback) is not tuple:
+            raise ValueError('Expected feedback\'s type to be tuple')
         if len(feedback) != 5:
             raise ValueError('Expected feedback\'s length to be equal to 5')
         
         for f in feedback:
+            if type(f) is not int:
+                raise ValueError('Expected feedback\'s values types to be int')
             if f < 0 or f > 2:
                 raise ValueError('Expected feedback\'s values to be in range [0,2]')
 
@@ -60,9 +65,8 @@ class WordleSolver:
         for candidate in self._candidates:
             if WordleSolver._should_add_candidate(candidate, restrictions):
                 new_candidates.add(candidate)
-            print(candidate,  new_candidates)
 
-        self._candidates = new_candidates.copy()
+        self._candidates = new_candidates
 
     @staticmethod
     def _should_add_candidate(candidate: str, restrictions: dict[str, LetterRestriction]) -> bool:

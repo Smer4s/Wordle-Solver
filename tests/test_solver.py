@@ -113,23 +113,24 @@ def test_solver_invalid_initialization(words: set[str]):
 
 
 def test_solver_invalid_guess():
-    words = ['apple']
+    words = set({'apple'})
     solver = build_solver(words)
     with pytest.raises(ValueError):
         solver.update('12345', (0, 0, 0, 0, 0))
 
 
-@pytest.mark.parametrize("feedback", [(1, 2, 3, 4, 5), (0, 0, 0, 0, 0, 0, 0, 0, 0)])
+@pytest.mark.parametrize("feedback", [(1, 2, 3, 4, 5), (0, 0, 0, 0, 0, 0, 0, 0, 0), (True, 0, 0, 0, 0), (0, 0, 0, 0, 0.5), ("0", "0", "0", "0", "0"), None, [0, 0, 0, 0, 0]])
 def test_solver_invalid_feedback(feedback: tuple[int, ...]):
-    words = ['apple']
+    words = set({'apple'})
     solver = build_solver(words)
     with pytest.raises(ValueError):
         solver.update('apple', feedback)
-        
+
+
 def test_impossible():
     solver = WordleSolver({"crane", "slate"})
 
     solver.update("crane", (2, 2, 2, 2, 2))
     solver.update("slate", (2, 2, 2, 2, 2))
-    
+
     assert solver.get_candidates() == set()
