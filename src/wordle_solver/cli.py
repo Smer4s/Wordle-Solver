@@ -1,6 +1,7 @@
+from game import WordleGame, GameStatus, GameEndedError
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
-WORDS_PATH = os.path.join(dir_path, 'src/data/allowed_words.txt')
+WORDS_PATH = os.path.join(dir_path, '../data/allowed_words.txt')
 MAX_ATTEMPTS = 6
 
 
@@ -37,5 +38,4 @@ def read_words(path: str) -> set[str]:
 
 
 if __name__ == "__main__":
-    from src.wordle.game import WordleGame, GameStatus, GameEndedError
     main()

@@ -1,5 +1,5 @@
 import pytest
-from engine.src.wordle.feedback import get_feedback
+from src.wordle_solver.feedback import get_feedback
 
 
 @pytest.mark.parametrize("answer,guess,expected", [("apple", "allee",

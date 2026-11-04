@@ -20,8 +20,10 @@ def get_feedback(answer: str, guess: str, allowed_words: set[str] = ()) -> tuple
 
     return compare(answer, guess)
 
+
 def normalize(word: str) -> str:
     return word.lower()
+
 
 def compare(answer: str, guess: str) -> tuple[int, ...]:
     idx: dict[int, int] = {i: 0 for i in range(len(guess))}

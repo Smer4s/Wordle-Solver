@@ -1,7 +1,8 @@
 import pytest
-from ..wordle.game import WordleGame, GameStatus, GameEndedError
 from random import choice
-from engine.main import MAX_ATTEMPTS
+from src.wordle_solver.game import WordleGame, GameStatus, GameEndedError
+
+MAX_ATTEMPTS = 6
 
 TEST_WORDS = {"crane", "slate", "apple", "grape"}
 
