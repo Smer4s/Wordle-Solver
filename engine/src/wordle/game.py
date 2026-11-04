@@ -1,9 +1,8 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from random import randint
-from src.wordle.feedback import get_feedback
-
+from random import choice
+from .feedback import get_feedback
 
 class GameStatus(Enum):
     IN_PROGRESS = "in_progress"
@@ -29,28 +28,43 @@ class WordleGame:
             self,
             allowed_words: set[str],
             max_attempts: int = 6) -> None:
-        self.allowed_words = allowed_words.copy()
-        answer = self.allowed_words[randint(0, len(allowed_words))]
-        self.answer = answer
+        if max_attempts <= 0:
+            raise ValueError(f'Expected max_attempts greater than 0, but got: {max_attempts}')
         self.max_attempts = max_attempts
-        self.current_attempt = 1
-        self.status = GameStatus.IN_PROGRESS
+        self.allowed_words = allowed_words.copy()
+        answer = choice(list(self.allowed_words))
+        self._answer = answer
+        self._status = GameStatus.IN_PROGRESS
+        self.history: list[GuessResult] = []
+
+    def get_answer(self) -> str:
+        return self._answer
+
+    def get_attempts(self) -> int:
+        return 1 + len(self.history)
+    
+    def get_status(self) -> GameStatus:
+        return self._status
 
     def submit_guess(self, guess: str) -> GuessResult:
-        if self.current_attempt > self.max_attempts:
-            raise GameEndedError('Ended attempts:', 'current:',
-                                 self.current_attempt, 'max:', self.max_attempts)
+        result = self._submit_guess(guess=guess)
+        self.history.append(result)
+        return result
 
-        if self.allowed_words.__contains__(guess) is False:
-            raise ValueError(guess, 'is not allowed word')
-        feedback = get_feedback(self.answer, guess)
+    def _submit_guess(self, guess: str) -> GuessResult:
+        if self._status != GameStatus.IN_PROGRESS:
+            raise GameEndedError('Game status is', self._status)
+        current_attempt = self.get_attempts()
+        if current_attempt > self.max_attempts:
+            raise GameEndedError('Ended attempts:', 'current:',
+                                 current_attempt, 'max:', self.max_attempts)
+
+        feedback = get_feedback(self._answer, guess, self.allowed_words)
         if feedback == tuple(2 for _ in guess):
-            self.status = GameStatus.WON
-            raise GameEndedError(
-                'You WON in', self.current_attempt, 'attempts!')
-        if self.current_attempt == self.max_attempts:
-            self.status = GameStatus.LOST
-            raise GameEndedError(
-                'You LOST. The WORD was:', self.answer)
-        self.current_attempt += 1
-        return GuessResult(guess, feedback, self.current_attempt)
+            self._status = GameStatus.WON
+            return GuessResult(guess, feedback, current_attempt)
+        if current_attempt == self.max_attempts:
+            self._status = GameStatus.LOST
+            return GuessResult(guess, feedback, current_attempt)
+
+        return GuessResult(guess, feedback, current_attempt)

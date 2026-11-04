@@ -1,5 +1,6 @@
-from src.wordle.game import WordleGame, GameStatus, GameEndedError
-WORDS_PATH = 'src/data/allowed_words.txt'
+import os
+dir_path = os.path.dirname(os.path.realpath(__file__))
+WORDS_PATH = os.path.join(dir_path, 'src/data/allowed_words.txt')
 MAX_ATTEMPTS = 6
 
 
@@ -11,10 +12,17 @@ def main():
 
     print('The WORD was guessed. Now it\'s your turn to make a GUESS')
 
-    while game.status == GameStatus.IN_PROGRESS:
-        guess = input(f'Guess #{game.current_attempt}: ')
+    while game.get_status() == GameStatus.IN_PROGRESS:
+        current_attempt = game.get_attempts()
+        guess = input(f'Guess #{current_attempt}: ')
         try:
             result = game.submit_guess(guess)
+            if game.get_status() != GameStatus.IN_PROGRESS:
+                if game.get_status() == GameStatus.WON:
+                    print('You WON in', current_attempt, 'attempts!')
+                else:
+                    print('You LOST. The WORD was:', game.get_answer())
+                break
             print('Feedback:', result.feedback)
         except ValueError as e:
             msg = ' '.join([str(arg) for arg in e.args])
@@ -24,10 +32,11 @@ def main():
             break
 
 
-def read_words(path: str) -> list[str]:
+def read_words(path: str) -> set[str]:
     with open(path) as f:
-        return [line.strip() for line in f.readlines()]
+        return set((line.strip() for line in f.readlines()))
 
 
 if __name__ == "__main__":
+    from src.wordle.game import WordleGame, GameStatus, GameEndedError
     main()

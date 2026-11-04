@@ -1,5 +1,7 @@
+from string import printable
 
-def get_feedback(answer: str, guess: str) -> tuple[int, ...]:
+
+def get_feedback(answer: str, guess: str, allowed_words: set[str] = ()) -> tuple[int, ...]:
     """
     Compare a guess against the hidden word.
 
@@ -12,15 +14,16 @@ def get_feedback(answer: str, guess: str) -> tuple[int, ...]:
     Raises:
         ValueError: if the input format is invalid.
     """
-    validate(guess)
-    validate(answer)
+
+    guess = guess.lower()
+    answer = answer.lower()
+    validate(guess, allowed_words)
+    validate(answer, allowed_words)
 
     return compare(answer, guess)
 
 
 def compare(answer: str, guess: str) -> tuple[int, ...]:
-    guess = guess.lower()
-    answer = answer.lower()
     idx: dict[int, int] = {i: 0 for i in range(len(guess))}
     found_idx: set[int] = set()
 
@@ -39,7 +42,7 @@ def compare(answer: str, guess: str) -> tuple[int, ...]:
             try_to_find = False
             if found_index == -1:
                 continue
-            if found_idx.__contains__(found_index) is False:
+            if found_index not in found_idx:
                 idx[i] = 1
                 found_idx.add(found_index)
             else:
@@ -49,8 +52,17 @@ def compare(answer: str, guess: str) -> tuple[int, ...]:
     return tuple(idx.values())
 
 
-def validate(guess: str) -> None:
-    if len(guess) != 5:
-        raise ValueError('Guess len is not 5')
-    if guess.isalpha() is False:
-        raise ValueError('Guess contains not only letters')
+def validate(word: str, allowed_words: set[str] = ()) -> None:
+    if word.isalpha() is False:
+        raise ValueError(f'Word: {word} contains not only letters')
+    if is_latin(word) is False:
+        raise ValueError(f'Word: {word} contains not only latin letters')
+    if len(word) != 5:
+        raise ValueError(f'Word: {word} len is not 5')
+    if len(allowed_words) != 0:
+        if word not in allowed_words:
+            raise ValueError(f'Word: {word} is not allowed word')
+
+
+def is_latin(text):
+    return not bool(set(text) - set(printable))
