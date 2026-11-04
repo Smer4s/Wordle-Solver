@@ -83,7 +83,7 @@ def test_try_after_game_end(get_game):
 
 
 def test_change_word_set():
-    allowed_words = TEST_WORDS
+    allowed_words = TEST_WORDS.copy()
     game = WordleGame(allowed_words, max_attempts=MAX_ATTEMPTS)
     word: str = 'aaaaa'
     allowed_words.add(word)

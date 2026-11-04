@@ -44,7 +44,7 @@ class WordleGame:
         self._status = GameStatus.IN_PROGRESS
         self._history: list[GuessResult] = []
 
-    def get_allowed_words(self) -> list[str]:
+    def get_allowed_words(self) -> set[str]:
         return self._allowed_words.copy()
     
     def get_history(self) -> list[GuessResult]:
