@@ -1,4 +1,4 @@
-from game import WordleGame, GameStatus, GameEndedError
+from .game import WordleGame, GameStatus, GameEndedError
 import os
 dir_path = os.path.dirname(os.path.realpath(__file__))
 WORDS_PATH = os.path.join(dir_path, '../data/allowed_words.txt')

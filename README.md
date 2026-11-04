@@ -4,19 +4,14 @@
 
 ## How to Run:
 
+### Pre-build:
+
+    uv sync
+
 ### Game:
 
-    cd .\engine\
     uv run main.py
 
 ### Tests:
 
-    cd .\engine\src\tests\
-
-#### Feedback tests:
-
-    pytest .\test_feedback.py 
-
-#### Game tests:
-
-    pytest .\test_game.py
+    uv run python -m pytest

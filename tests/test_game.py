@@ -1,6 +1,6 @@
 import pytest
 from random import choice
-from src.wordle_solver.game import WordleGame, GameStatus, GameEndedError
+from wordle_solver.game import WordleGame, GameStatus, GameEndedError
 
 MAX_ATTEMPTS = 6
 

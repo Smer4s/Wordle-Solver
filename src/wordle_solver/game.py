@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from random import choice
-from feedback import get_feedback, validate, normalize
+from .feedback import get_feedback, validate, normalize
 
 class GameStatus(Enum):
     IN_PROGRESS = "in_progress"
