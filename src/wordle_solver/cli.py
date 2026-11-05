@@ -32,9 +32,9 @@ def main():
             break
 
 
-def read_words(path: str) -> set[str]:
+def read_words(path: str, count: int = -1) -> set[str]:
     with open(path) as f:
-        return set((line.strip() for line in f.readlines()))
+        return set((line.strip() for line in f.readlines((count-1) * 6)))
 
 
 if __name__ == "__main__":
