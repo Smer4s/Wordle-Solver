@@ -5,6 +5,21 @@ from .strategies import FrequencyStrategy
 from time import perf_counter
 
 
+def benchmark():
+    print('COUNT', 'TIME (ms)')
+    counts = [10, 100, 200, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
+    for count in counts:
+        allowed_words = read_words(WORDS_PATH, count)
+        solver = WordleSolver(allowed_words)
+        strategy = FrequencyStrategy()
+        candidates = solver.get_candidates()
+        start_time = perf_counter()
+        _ = strategy.select_guess(candidates)
+        end_time = perf_counter()
+
+        print(count, "{:.2f}".format((end_time - start_time)*1000))
+
+
 def main():
     allowed_words = read_words(WORDS_PATH)
     print('Read:', len(allowed_words), 'words')

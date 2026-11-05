@@ -50,6 +50,7 @@ def test_empty_candidates():
     with pytest.raises(ValueError):
         strategy = FrequencyStrategy()
         strategy.select_guess(set())
+        strategy.score_word("apple", set())
         
 def test_single_candidate():
     candidates = {
@@ -80,3 +81,4 @@ def test_determinism():
     strategy = FrequencyStrategy()
 
     assert strategy.score_words(candidates) == strategy.score_words(diff_order_candidates)
+    assert strategy.select_guess(candidates) == strategy.select_guess(diff_order_candidates)
