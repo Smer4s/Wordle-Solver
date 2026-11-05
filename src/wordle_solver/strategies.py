@@ -35,6 +35,10 @@ class FrequencyStrategy:
     def score_words(self, candidates: set[str]) -> dict[str, int]:
         if len(candidates) == 0:
             raise ValueError("Expected candidates to not be empty")
+        
+        for candidate in candidates:
+            validate(candidate)
+
 
         letter_freq: dict[str, int] = {}
         letters: set[str] = set()
