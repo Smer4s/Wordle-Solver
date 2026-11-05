@@ -47,10 +47,17 @@ def test_duplicate_letters():
     assert scores == {"apple": 11, "ample": 12, "apply": 10}
     
 def test_empty_candidates():
+    strategy = FrequencyStrategy()
     with pytest.raises(ValueError):
-        strategy = FrequencyStrategy()
         strategy.select_guess(set())
+    with pytest.raises(ValueError):
         strategy.score_word("apple", set())
+    with pytest.raises(ValueError):
+        strategy.score_word("bad", {"apple"})
+    with pytest.raises(ValueError):
+        strategy.score_word("piper", {"apple"})
+    with pytest.raises(ValueError):
+        strategy.score_word("bad", {"bad"})
         
 def test_single_candidate():
     candidates = {

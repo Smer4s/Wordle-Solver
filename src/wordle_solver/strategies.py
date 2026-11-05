@@ -1,3 +1,4 @@
+from .feedback import validate
 
 class FrequencyStrategy:
     def score_word(
@@ -13,6 +14,13 @@ class FrequencyStrategy:
         if len(candidates) == 0:
             raise ValueError("Expected candidates to not be empty")
         
+        if word not in candidates:
+            raise ValueError("Expected word to be in candidates")
+        
+        validate(word)
+        for candidate in candidates:
+            validate(candidate)
+        
         letter_dict: dict[str, int] = {letter: 0 for letter in word}
 
         for candidate in candidates:
@@ -24,7 +32,7 @@ class FrequencyStrategy:
 
         return sum(letter_dict.values())
 
-    def score_words(self, candidates: list[str]) -> dict[str, int]:
+    def score_words(self, candidates: set[str]) -> dict[str, int]:
         if len(candidates) == 0:
             raise ValueError("Expected candidates to not be empty")
 
