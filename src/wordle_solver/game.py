@@ -1,7 +1,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from random import choice
+from random import choice, seed
 from .feedback import get_feedback, validate, normalize
 
 class GameStatus(Enum):
@@ -27,7 +27,8 @@ class WordleGame:
     def __init__(
             self,
             allowed_words: set[str],
-            max_attempts: int = 6) -> None:
+            max_attempts: int = 6,
+            rand_seed: int = -1) -> None:
         if type(max_attempts) is not int:
             raise ValueError(f'Expected type of max_attempts to be int, but got: {type(max_attempts)}')
         if max_attempts <= 0:
@@ -39,6 +40,7 @@ class WordleGame:
         for word in allowed_words:
             validate(word)
         self._allowed_words = allowed_words.copy()
+        seed(rand_seed)
         answer = choice(list(self._allowed_words))
         self._answer = answer
         self._status = GameStatus.IN_PROGRESS
