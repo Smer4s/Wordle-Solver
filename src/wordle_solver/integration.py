@@ -4,155 +4,155 @@ from .solver import WordleSolver
 from .strategies.strategy import Strategy
 from .strategies.frequency import FrequencyStrategy
 from .strategies.entropy import EntropyStrategy
+from .strategies.probe_entropy import ProbeEntropyStrategy
 from time import perf_counter
 from random import randint, seed, sample
 from dataclasses import dataclass
+from math import fsum
 
-TRIES_COUNT = 100
-WORD_COUNT = 1000
-
-
-@dataclass
-class BenchmarkResult:
-    win_rate: float
-    avg_attempts: float
-    failures: int
-    avg_decision_time: float
-    min_attempts: int
-    max_attempts: int
-
-
-def benchmark_loop(strategy: Strategy, tries_count: int, word_count: int, seeds: list[int], words: list[str]) -> BenchmarkResult:
-    (min_attempts, max_attempts) = (6, 0)
-    (wins, failures) = (0, 0)
-    total_attempts: list[float] = []
-    decision_times: list[float] = []
-    for i in range(tries_count):
-        seed = seeds[i]
-        (game, solver) = init_game(word_count, words, seed)
-        answer: str = ''
-        status: GameStatus = GameStatus.IN_PROGRESS
-        for _ in range(MAX_ATTEMPTS):
-            candidates = solver.get_candidates()
-            start_time = perf_counter()
-            guess = strategy.select_guess(candidates)
-            end_time = perf_counter()
-            decision_times.append(end_time - start_time)
-            result = game.submit_guess(guess)
-            status = game.get_status()
-            if status != GameStatus.IN_PROGRESS:
-                answer = game.get_answer()
-                if status == GameStatus.WON:
-                    wins += 1
-                    attempts = game.get_attempts() - 1
-                    total_attempts.append(attempts)
-                    if attempts > max_attempts:
-                        max_attempts = attempts
-                    if attempts < min_attempts:
-                        min_attempts = attempts
-                else:
-                    failures += 1
-                break
-            solver.update(guess, result.feedback)
-
-        print(f'{type(strategy).__name__}: try #{i+1} of {TRIES_COUNT} tries ended with status: {status}',
-              'Answer:', answer)
-
-    win_rate = wins / tries_count
-    avg_decision_time = sum(decision_times) / len(decision_times)
-    if len(total_attempts) == 0:
-        avg_attempts = 0
-    else:
-        avg_attempts = sum(total_attempts) / len(total_attempts)
-
-    return BenchmarkResult(win_rate, avg_attempts, failures, avg_decision_time, min_attempts, max_attempts)
-
-
-def init_game(word_count: int, words: list[str], seed: int) -> tuple[WordleGame, WordleSolver]:
-    allowed_words = pick_random_words(words, word_count)
-
-    game = WordleGame(
-        allowed_words, max_attempts=MAX_ATTEMPTS, rand_seed=seed)
-    solver = WordleSolver(allowed_words)
-
-    return (game, solver)
+TRIES_COUNT = 10
 
 
 def pick_random_words(words: list[str], word_count: int) -> set[str]:
     return set(sample(words, word_count))
 
 
-def winrate_benchmark():
-    strategies = [FrequencyStrategy(), EntropyStrategy()]
-    seed(-1)
-    seeds = [randint(1, 10000) for _ in range(TRIES_COUNT)]
-    words = list(read_words(WORDS_PATH))
-    results: dict[Strategy, BenchmarkResult] = {}
-    for strategy in strategies:
-        start_time = perf_counter()
-        result = benchmark_loop(strategy, TRIES_COUNT,
-                                WORD_COUNT, seeds, words)
-        end_time = perf_counter()
-        results.update({strategy: result})
-        print()
-        print('Ended benchmark for:', type(strategy).__name__, )
-        print(f'Total benchmark time: {(end_time-start_time):.5f}s')
-        print()
+def time_entropy_benchmark(words: list[str]):
+    word_counts = [10, 25, 50]
+    strategy = EntropyStrategy()
+    print()
+    print('Benchmark result for:', type(strategy).__name__)
+    print('WORD_COUNT', 'TIME')
+    for word_count in word_counts:
+        times: list[float] = []
+        for _ in range(TRIES_COUNT):
+            candidates = set(words[:word_count])
+            start_time = perf_counter()
+            strategy.select_guess(candidates)
+            end_time = perf_counter()
+            time_diff = end_time - start_time
+            times.append(time_diff)
 
-    for (strategy, result) in results.items():
-        print()
-        print('Benchmark result for:', type(strategy).__name__)
-        print(f'Loops count: {TRIES_COUNT}')
-        print(f'Word count: {WORD_COUNT}')
-        print(f'Win rate: {result.win_rate * 100}%')
-        print(f'Average attempts: {result.avg_attempts}')
-        print(f'Failure count: {result.failures}')
-        print(
-            f'Average Decision Time of `select_guess`: {result.avg_decision_time:.5f}s')
-        print(f'Maximum attempts: {result.max_attempts}')
-        print(f'Minimum attempts: {result.min_attempts}')
-        print()
+        avg_time = fsum(times) / len(times)
+        print(word_count, format(avg_time, ".4f"))
+
+
+def time_probe_benchmark(words: list[str]):
+
+    params = [
+        (10, 10), (10, 100), (25, 100), (50, 100)]
+    print()
+    print('Benchmark result for:', ProbeEntropyStrategy.__name__)
+    print('WORD_COUNT', 'TIME')
+    for (candidates_count, guess_count) in params:
+        times: list[float] = []
+        for _ in range(TRIES_COUNT):
+            allowed_guesses = set(words[:guess_count])
+            strategy = ProbeEntropyStrategy(allowed_guesses)
+            candidates = set(words[:candidates_count])
+            start_time = perf_counter()
+            strategy.select_guess(candidates)
+            end_time = perf_counter()
+            time_diff = end_time - start_time
+            times.append(time_diff)
+
+            avg_time = fsum(times) / len(times)
+        print((candidates_count, guess_count), format(avg_time, ".4f"))
 
 
 def time_benchmark():
-    strategies: list[Strategy] = [FrequencyStrategy(), EntropyStrategy()]
-    word_counts = [10, 20, 50, 100, 250, 500, 1000, 2000, 3000, 4000, 5000]
-    for strategy in strategies:
+    seed(-1)
+    words = list(read_words(WORDS_PATH))
+    random_words = list(pick_random_words(words, 100))
+    time_entropy_benchmark(random_words)
+    time_probe_benchmark(random_words)
+
+
+def game_test():
+    words = list(read_words(WORDS_PATH))
+
+    entropies_results: list[tuple[GameStatus, int]] = []
+    probes_results: list[tuple[GameStatus, int]] = []
+    for i in range(TRIES_COUNT):
+        random_seed = randint(1, 1000)
+        print(f'Iteration #{i+1}:')
+        random_words = pick_random_words(words, 1000)
         print()
-        print('Benchmark result for:', type(strategy).__name__)
-        print('WORD_COUNT', 'TIME')
-        for word_count in word_counts:
-            words = read_words(WORDS_PATH, word_count)
-            time_diff = 0.0
-            start_time = perf_counter()
-            strategy.select_guess(words)
-            end_time = perf_counter()
-            time_diff = end_time - start_time
-            print(word_count, format(time_diff, ".4f"))
+        print('Started entropy game')
+        seed(random_seed)
+        entropies_results.append(play_entropy(random_words))
+        print()
+        print('Started probe game')
+        seed(random_seed)
+        probes_results.append(play_probe(random_words))
+        print()
+
+    print('Entropy results:')
+    print_results(entropies_results)
+    print()
+
+    print('Probe results:')
+    print_results(probes_results)
+    print()
+
+
+def print_results(results: list[tuple[GameStatus, int]]):
+    total_games = len(results)
+    (wins, failures) = (0, 0)
+    win_attempts: list[int] = []
+    for result in results:
+        if result[0] == GameStatus.WON:
+            wins += 1
+            win_attempts.append(result[1])
+        else:
+            failures += 1
+
+    win_rate: float = wins * 100 / total_games
+    avg_attempts = sum(win_attempts) / wins
+    print('Total games:', total_games)
+    print(f'Win-Rate: {win_rate:.1f}%')
+    print('Failures:', failures)
+    print('Avg attempts (wins):', avg_attempts)
+
+
+def play_probe(random_words: set[str]) -> tuple[GameStatus, int]:
+    strategy = ProbeEntropyStrategy(random_words)
+    (game, solver) = init_game(random_words)
+    for _ in range(MAX_ATTEMPTS):
+        attempt = game.get_attempts()
+        candidates = solver.get_candidates()
+        guess = strategy.select_guess(candidates)
+        result = game.submit_guess(guess)
+        status = game.get_status()
+        if status != GameStatus.IN_PROGRESS:
+            return (status, attempt)
+        solver.update(guess, result.feedback)
+
+
+def play_entropy(random_words: set[str]) -> tuple[GameStatus, int]:
+    strategy = EntropyStrategy()
+    (game, solver) = init_game(random_words)
+    for _ in range(MAX_ATTEMPTS):
+        attempt = game.get_attempts()
+        candidates = solver.get_candidates()
+        guess = strategy.select_guess(candidates)
+        result = game.submit_guess(guess)
+        status = game.get_status()
+        if status != GameStatus.IN_PROGRESS:
+            return (status, attempt)
+        solver.update(guess, result.feedback)
+
+
+def init_game(words: set[str],) -> tuple[WordleGame, WordleSolver]:
+    game = WordleGame(words, max_attempts=MAX_ATTEMPTS)
+    solver = WordleSolver(words)
+
+    return (game, solver)
 
 
 def main():
     # time_benchmark()
-    winrate_benchmark()
-    # candidates = {
-    #     "bobby",
-    #     "bimbo",
-    #     "bingo",
-    #     "bongo",
-    #     "beefy",
-    #     "peppy",
-    #     "berry",
-    #     "biker",
-    # }
-
-    # freq = FrequencyStrategy()
-    # entr = EntropyStrategy()
-
-    # print(freq.score_words(candidates))
-    # print(entr.calculate_entropies(candidates))
-
-    # print(freq.select_guess(candidates))
-    # print(entr.select_guess(candidates))
+    game_test()
 
 
 if __name__ == "__main__":

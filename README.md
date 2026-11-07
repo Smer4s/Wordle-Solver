@@ -152,3 +152,196 @@
 **Вопрос 4.** Почему стратегия с максимальной энтропией не обязательно минимизирует среднее число ходов до победы?
 
 > **EntropyStrategy** оптимизирует ожидаемое количество информации от текущего хода, но не моделирует будущую последовательность решений, непосредственную победу и ограничение в шесть попыток.
+
+## Probe Guess Strategy
+
+### Как работает Probe Guess Strategy
+
+Алгоритм *Probe Guess Strategy* основан на *Entropy Strategy*, однако может выбрать слово не из выбранного набора кандидатов \(N\), а всего словаря \(G\) (набор кандидатов \(N\) выбирается из всего словаря игры \(G\)).:
+
+1. Алгоритм вычисляет энтропию для каждого слова из всего словаря \(G\), относительно набора кандидатов \(N\) по алгоритму *Entropy Strategy*.
+2. Из полученного списка энтропий выбирается слово с максимальным значением для набора кандидатов \(N\).
+3. Если максимальная энтропия достигается на кандидате из \(N\), то в приоритете выбирается именно он, так как имеет шанс быть победным словом.
+4. Также учитывается **лексикографический tie-breaking** если варианты для выбора принадлежат одной категории.
+5. Полученное слово и является самым лучшим ходом.
+
+### Benchmark
+
+#### Win-Rate Benchmark Comparison
+
+#### Benchmark parameters: 
+
+1. Loops count: 10
+2. Word count: 1000
+
+
+| Metric                   | Probe Guess               | Entropy          |
+| ------------------------ | ------------------------- | ---------------- |
+| Win Rate %               | 100.0                     | 100.0            |
+| Avg. Attempts (wins)     | 3.2                       | 3.3              |
+| Failures                 | 0                         | 0                |
+
+#### Game History:
+
+    Iteration #1:
+
+    Started entropy game
+    max: tores 5.9548149584617365 candidates_len: 1000
+    max: dealt 3.906890595608519 candidates_len: 15
+    max: depth as a single candidate
+
+    Started probe game
+    max: tores 5.9548149584617365 is in candidates: True candidates_len: 1000
+    max: dealt 3.906890595608519 is in candidates: True candidates_len: 15
+    max: depth as a single candidate
+
+    Iteration #2:
+
+    Started entropy game
+    max: roles 5.944496018242843 candidates_len: 1000
+    max: easer 2.721928094887362 candidates_len: 10
+
+    Started probe game
+    max: roles 5.944496018242843 is in candidates: True candidates_len: 1000
+    max: heave 2.9219280948873623 is in candidates: False candidates_len: 10
+    max: easer as a single candidate
+
+    Iteration #3:
+
+    Started entropy game
+    max: tores 6.041125840338881 candidates_len: 1000
+    max: makes 2.967948042127666 candidates_len: 37
+    max: adzes 1.0 candidates_len: 2
+
+    Started probe game
+    max: tores 6.041125840338881 is in candidates: True candidates_len: 1000
+    max: admix 3.4037035301388583 is in candidates: False candidates_len: 37
+    max: adzes as a single candidate
+
+    Iteration #4:
+
+    Started entropy game
+    max: tires 5.993516234980124 candidates_len: 1000
+    max: lases 2.9334073984966573 candidates_len: 41
+    max: moses 1.5 candidates_len: 4
+    max: yeses as a single candidate
+
+    Started probe game
+    max: tires 5.993516234980124 is in candidates: True candidates_len: 1000
+    max: clank 3.407066766425306 is in candidates: False candidates_len: 41
+    max: poses 2.8073549220576037 is in candidates: True candidates_len: 7
+    max: yeses as a single candidate
+
+    Iteration #5:
+
+    Started entropy game
+    max: tears 5.940489160612409 candidates_len: 1000
+    max: locks 4.055891933819038 candidates_len: 66
+    max: mungs 2.8073549220576037 candidates_len: 7
+    max: nighs as a single candidate
+
+    Started probe game
+    max: tears 5.940489160612409 is in candidates: True candidates_len: 1000
+    max: cloud 4.648106575139952 is in candidates: False candidates_len: 66
+    max: monks 2.584962500721156 is in candidates: False candidates_len: 6
+    max: nighs as a single candidate
+
+    Iteration #6:
+
+    Started entropy game
+    max: tears 5.967260932162371 candidates_len: 1000
+    max: hotly 4.037401197654112 candidates_len: 19
+    max: donut 1.0 candidates_len: 2
+    max: joint as a single candidate
+
+    Started probe game
+    max: tears 5.967260932162371 is in candidates: True candidates_len: 1000
+    max: hotly 4.037401197654112 is in candidates: True candidates_len: 19
+    max: about 1.0 is in candidates: False candidates_len: 2
+    max: joint as a single candidate
+
+    Iteration #7:
+
+    Started entropy game
+    max: tares 6.099683555389317 candidates_len: 1000
+    max: rares as a single candidate
+
+    Started probe game
+    max: tares 6.099683555389317 is in candidates: True candidates_len: 1000
+    max: rares as a single candidate
+
+    Iteration #8:
+
+    Started entropy game
+    max: pares 5.990177427628695 candidates_len: 1000
+    max: tomes 2.699926633446282 candidates_len: 27
+    max: codes 2.2516291673878226 candidates_len: 6
+    max: dozes as a single candidate
+
+    Started probe game
+    max: pares 5.990177427628695 is in candidates: True candidates_len: 1000
+    max: ioctl 3.33397905858568 is in candidates: False candidates_len: 27
+    max: damed 2.0 is in candidates: False candidates_len: 4
+    max: dozes as a single candidate
+
+    Iteration #9:
+
+    Started entropy game
+    max: rates 6.010654756161847 candidates_len: 1000
+    max: dices 3.0328625918553085 candidates_len: 33
+    max: puces as a single candidate
+
+    Started probe game
+    max: rates 6.010654756161847 is in candidates: True candidates_len: 1000
+    max: dicks 3.528057755197613 is in candidates: False candidates_len: 33
+    max: puces as a single candidate
+
+    Iteration #10:
+
+    Started entropy game
+    max: tares 6.085170519504347 candidates_len: 1000
+    max: coats 2.321928094887362 candidates_len: 5
+    max: pitas as a single candidate
+
+    Started probe game
+    max: tares 6.085170519504347 is in candidates: True candidates_len: 1000
+    max: aglow 2.321928094887362 is in candidates: False candidates_len: 5
+    max: pitas as a single candidate
+
+#### Description:
+
+> Я провёл опыт из 10 игр бок-о-бок с одинаковыми стартовыми словами и ответами. Ход каждой из игр представлен в **Game History**, а результаты представлены в табличке.
+> 1000 слов и всего 10 попыток это слишком нерепрезентативная выборка, чтобы утверждать, какой из алгоритмов лучше или хуже, несмотря даже на отличающиеся параметры средних попыток. Куда интереснее история игр и принятые решения.
+> На примере игры #2 видна разница этих алгоритмов. Первый ход одинаковый, но уже на втором ходу **Probe Guess** решает выбрать слово `heave` с большей энтропией, и не из набора кандидатов, а **Entropy Strategy** выбрал слово `easer` что и было ответом. На третих ход **Probe Guess** всё таки выбрал `easer` как единственного кандидата.
+> По аналогичному сценарию идёт игра #6. Различия лишь начались на 3 ход, но так как слова `donut` и `about` имели одниковую энтропию то они оба оставили `joint` как единственного кандидата, что и было победой.
+> Также отличается игра #8. На втором ходу **Probe Guess** выбрало слово с большей энтропией чем **Entropy Strategy**, что и позволило оставить лишь 4 кандидата на следующий ход, против 6 кандидатов. А на следующем ходу было выбрано слово `damed` хоть и с меньшей энтропией (кол-во кандидатов всё-же разное в этих ходах), но всё равно оставило им обоим последнего кандидата `dozes`, что и стало правильным ответом. Кол-во ходов у обоих стратегий одинаковое.
+> Остальные партии по своей сути очень схожи. Хоть и принятые `guess` у них разные, в обоих стратегиях одинаковый исход по разделению кандидатов.
+> В общем и целом, по такому тесту можно заключить, что ситуации, где **Probe Guess** тратит лишний ход можно, но 10 партий из 1000 слов это всё же мало для того, чтобы утверждать что он мене эффективный, чем **Entropy Strategy**. Однако также, стоит подметить, что действительно во всех случаев, кол-во оставшихся кандидатов после разбиения либо совпадает, либо меньше, чем у **Entropy Strategy**.
+
+#### Performance Benchmark Comparison
+
+| Word Count | Candidates Count | Entropy   | Probe Guess | Delta Candidates | Delta Words | Total Delta | Time Delta For Probe |
+| ---------- | ---------------- | --------- | ----------- | ---------------- | ----------- | ----------- | -------------------- |
+| 10         | 10               | 0.0006    | 0.0006      | -                | -           | -           | -                    |
+| 100        | 10               | -//-      | 0.0054      | x1               | x10         | x10         | x9                   |
+| 100        | 25               | 0.0035    | 0.0134      | x2.5             | x1          | x2.5        | x2.48                |
+| 100        | 50               | 0.0133    | 0.0257      | x2               | x1          | x2          | x1.91                |
+
+
+### FAQ
+
+**Вопрос 1.** Почему попытка, которой нет среди `possible_answers`, может иметь большую энтропию, чем любой из оставшихся кандидатов?
+
+> Потому что алгоритм оценивает все возможные слова по энтропии, в следствие чего может возникнуть ситуация, когда слово из всего словаря более информативно, чем любой кандидат. Такой случай представлен в тесте `test_probe_guess_over_candidates`.
+
+**Вопрос 2.** Почему при равной энтропии разумно предпочесть слово, которое может быть правильным ответом?
+
+> Потому что тогда есть вероятность, что это слово окажется победным, что позволит сократить количество ходов.
+
+**Вопрос 3.** Какова сложность **ProbeEntropyStrategy** при \(N\) возможных ответах и \(G\) допустимых попытках? Что произойдёт с производительностью, если \(G\) станет в десять раз больше?
+
+> Алгоритм вычисляет энтропию для каждого слова из всего словаря \(G\), относительно набора кандидатов \(N\). Получается цикл вычислений для каждого слова из \(G\) вычисляется энтропия всех кандидатов \(N\). Получается O\(G*N\). Это подтверждает **Performance Benchmark**: при увеличении \(G\), а \(N\) зафиксировать, то и время увеличится линейно, аналогично и обратная ситуация, когда \(N\) меняется, а \(G\) нет, и тоже время увеличивается линейно в delta\(N\) раз.
+
+**Вопрос 4.** Допустим, осталась одна попытка до поражения, а **ProbeEntropyStrategy** предлагает слово вне `candidates`, обладающее максимальной энтропией. Почему следовать этому выбору было бы ошибкой?
+
+> То, что алгоритм не учитывает кол-во оставшихся попыток является серьёзным недостатком. В описанной ситуации выбирать слово вне `candidates` на последней попытке приведёт к гарантированному поражению. Несмотря на то, что это слово будет более информативно, чем любой из кандидатов, выйгрыш важнее, но алгоритм этого не учитывает.

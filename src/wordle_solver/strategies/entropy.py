@@ -21,13 +21,13 @@ class EntropyStrategy(Strategy):
         for candidate in candidates:
             validate(candidate)
 
-        feedbacks = self._get_candidate_feedbacks(candidates, guess)
+        feedbacks = self.get_candidate_feedbacks(candidates, guess)
 
-        entropy = self._calculate_entropy(candidates, feedbacks)
+        entropy = self.calculate_entropy_feedbacks(candidates, feedbacks)
 
         return entropy
 
-    def _calculate_entropy(self, candidates: set[str], feedbacks: dict[tuple[int, ...], list[str]]):
+    def calculate_entropy_feedbacks(self, candidates: set[str], feedbacks: dict[tuple[int, ...], list[str]]):
         freqs: list[float] = [len(group) / len(candidates)
                               for (_, group) in feedbacks.items()]
 
@@ -45,14 +45,14 @@ class EntropyStrategy(Strategy):
 
         entropies: dict[str, float] = dict()
         for guess in candidates:
-            feedbacks = self._get_candidate_feedbacks(candidates, guess)
-            entropy = self._calculate_entropy(candidates, feedbacks)
+            feedbacks = self.get_candidate_feedbacks(candidates, guess)
+            entropy = self.calculate_entropy_feedbacks(candidates, feedbacks)
 
             entropies.update({guess: entropy})
 
         return entropies
 
-    def _get_candidate_feedbacks(self, candidates: set[str], guess: str) -> dict[tuple[int, ...], list[str]]:
+    def get_candidate_feedbacks(self, candidates: set[str], guess: str) -> dict[tuple[int, ...], list[str]]:
         feedbacks: dict[tuple[int, ...], list[str]] = dict()
         for candidate in candidates:
             feedback = get_feedback(candidate, guess)
@@ -75,10 +75,20 @@ class EntropyStrategy(Strategy):
         """
         if len(candidates) == 0:
             raise ValueError("Expected candidates to not be empty")
+        
+        if len(candidates) == 1:
+            guess = next(iter(candidates))
+            print('max:', guess, 'as a single candidate')
+            return guess
 
         entropies = self.calculate_entropies(candidates)
 
-        return self.select_guess_with_max_entropy(entropies)
+        guess = self.select_guess_with_max_entropy(entropies)
+        guess_entropy = entropies[guess]
+        print('max:', guess,  guess_entropy,
+              'candidates_len:', len(candidates))
+        
+        return guess
 
     def select_guess_with_max_entropy(
         self,

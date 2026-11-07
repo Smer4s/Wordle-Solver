@@ -1,5 +1,6 @@
 from .strategy import Strategy
 from .entropy import EntropyStrategy
+from ..feedback import validate
 
 
 class ProbeEntropyStrategy(Strategy):
@@ -7,6 +8,14 @@ class ProbeEntropyStrategy(Strategy):
     def __init__(
             self,
             allowed_guesses: set[str]):
+        if not allowed_guesses:
+            raise ValueError('Expected allowed guesses not to be empty')
+
+        if type(allowed_guesses) is not set:
+            raise ValueError('Expected allowed guesses to be set')
+
+        for guess in allowed_guesses:
+            validate(guess)
         self._allowed_guesses = allowed_guesses.copy()
 
     def calculate_entropy(
@@ -14,6 +23,11 @@ class ProbeEntropyStrategy(Strategy):
         guess: str,
         candidates: set[str],
     ) -> float:
+        if not candidates.issubset(self._allowed_guesses):
+            raise ValueError("Expected candidates to be in allowed guesses")
+        if guess not in self._allowed_guesses:
+            raise ValueError("Expected guess to be in allowed guesses")
+
         entropyStrategy = EntropyStrategy()
 
         return entropyStrategy.calculate_entropy(guess, candidates)
@@ -22,21 +36,35 @@ class ProbeEntropyStrategy(Strategy):
         self,
         candidates: set[str],
     ) -> str:
-        entropyStrategy = EntropyStrategy()
-        
         if not candidates.issubset(self._allowed_guesses):
             raise ValueError("Expected candidates to be in allowed guesses")
-        
-        entropies = entropyStrategy.calculate_entropies(self._allowed_guesses)
+
+        if len(candidates) == 1:
+            guess = next(iter(candidates))
+            print('max:', guess, 'as a single candidate')
+            return guess
+
+        entropyStrategy = EntropyStrategy()
+
+        entropies: dict[str, float] = dict()
+        for guess in self._allowed_guesses:
+            feedbacks = entropyStrategy.get_candidate_feedbacks(
+                candidates, guess)
+            entropy = entropyStrategy.calculate_entropy_feedbacks(
+                candidates, feedbacks)
+
+            entropies.update({guess: entropy})
 
         guess = entropyStrategy.select_guess_with_max_entropy(entropies)
-        
+
         guess_entropy = entropies[guess]
-        
+        print('max:', guess,  guess_entropy, 'is in candidates:', guess in candidates,
+              'candidates_len:', len(candidates))
+
         for (word, entropy) in entropies.items():
             if entropy == guess_entropy and word in candidates:
-                if guess in candidates and word < guess:
+                if guess not in candidates and word < guess:
                     guess = word
-            
-        return guess
+                    guess_entropy = entropies[guess]
 
+        return guess

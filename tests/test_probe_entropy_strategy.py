@@ -16,7 +16,6 @@ def test_probe_guess_over_candidates():
         "turns", candidates
     ) == pytest.approx(2.0)
 
-
     assert strategy.calculate_entropy(
         "bight", candidates
     ) == pytest.approx(0.543564, abs=1e-5)
@@ -29,9 +28,10 @@ def test_probe_single_candidate():
     allowed_guesses = {"bight", "turns"}
 
     strategy = ProbeEntropyStrategy(allowed_guesses)
-    
+
     assert strategy.select_guess(candidates) == "bight"
-    
+
+
 def test_probe_candidates_only():
     candidates = {
         "bight", "fight", "light", "might",
@@ -41,3 +41,21 @@ def test_probe_candidates_only():
     strategy = ProbeEntropyStrategy(candidates)
 
     assert strategy.select_guess(candidates) == "bight"
+
+
+def test_validation():
+    with pytest.raises(ValueError):
+        ProbeEntropyStrategy(set())
+    with pytest.raises(ValueError):
+        ProbeEntropyStrategy({'abc12'})
+    with pytest.raises(ValueError):
+        ProbeEntropyStrategy({'abcdef'})
+    with pytest.raises(ValueError):
+        ProbeEntropyStrategy('set')
+
+    candidates = {"bight"}
+    allowed_guesses = {"turns"}
+    strategy = ProbeEntropyStrategy(allowed_guesses)
+    
+    with pytest.raises(ValueError):
+        strategy.select_guess(candidates)
