@@ -1,6 +1,7 @@
 from .feedback import validate, get_feedback
 from .solver import WordleSolver
 from math import log2
+from pytest import approx
 from abc import ABC, abstractmethod
 
 
@@ -119,12 +120,7 @@ class EntropyStrategy(Strategy):
         for candidate in candidates:
             validate(candidate)
 
-        feedbacks: dict[tuple[int, ...], list[str]] = dict()
-        for candidate in candidates:
-            feedback = get_feedback(guess, candidate, candidates)
-            group = feedbacks.get(feedback, [])
-            group.append(candidate)
-            feedbacks.update({feedback: group})
+        feedbacks = self._get_candidate_feedbacks(candidates, guess)
 
         freqs: list[float] = [len(group) / len(candidates)
                               for (_, group) in feedbacks.items()]
@@ -140,17 +136,14 @@ class EntropyStrategy(Strategy):
 
     def calculate_entropies(self,
                             candidates: set[str]) -> dict[str, float]:
+        if len(candidates) == 0:
+            raise ValueError("Expected candidates to not be empty")
+        for candidate in candidates:
+            validate(candidate)
 
         entropies: dict[str, float] = dict()
-        group_feedbacks = []
         for guess in candidates:
-            feedbacks: dict[tuple[int, ...], list[str]] = dict()
-            for candidate in candidates:
-                feedback = get_feedback(guess, candidate, candidates)
-                group = feedbacks.get(feedback, [])
-                group.append(candidate)
-                feedbacks.update({feedback: group})
-            group_feedbacks.append((guess, feedbacks))
+            feedbacks = self._get_candidate_feedbacks(candidates, guess)
             freqs: list[float] = [len(group) / len(candidates)
                                   for (_, group) in feedbacks.items()]
 
@@ -164,6 +157,16 @@ class EntropyStrategy(Strategy):
             entropies.update({guess: entropy})
 
         return entropies
+
+    def _get_candidate_feedbacks(self, candidates: set[str], guess: str) -> dict[tuple[int, ...], list[str]]:
+        feedbacks: dict[tuple[int, ...], list[str]] = dict()
+        for candidate in candidates:
+            feedback = get_feedback(candidate, guess,  candidates)
+            group = feedbacks.get(feedback, [])
+            group.append(candidate)
+            feedbacks.update({feedback: group})
+
+        return feedbacks
 
     def select_guess(
         self,
@@ -182,7 +185,7 @@ class EntropyStrategy(Strategy):
         for (guess, entropy) in entropies.items():
             if entropy > max_pair[1]:
                 max_pair = (guess, entropy)
-            if entropy == max_pair[1] and guess < max_pair[0]:
+            if approx(entropy, rel=1e-5) == approx(max_pair[1], rel=1e-5) and guess < max_pair[0]:
                 max_pair = (guess, entropy)
 
         return max_pair[0]
