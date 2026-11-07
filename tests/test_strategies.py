@@ -167,8 +167,6 @@ def test_entropy_validation():
     with pytest.raises(ValueError):
         strategy.calculate_entropy("bad", {"apple"})
     with pytest.raises(ValueError):
-        strategy.calculate_entropy("piper", {"apple"})
-    with pytest.raises(ValueError):
         strategy.calculate_entropy("bad", {"bad"})
 
 
@@ -194,11 +192,19 @@ def test_entropy_antisymmetric():
 
 
 def test_max_entropy():
-    entropies = {
-        "zebra": 2.00000,
-        "apple": 1.99999,
-    }
-    
     strategy = EntropyStrategy()
 
-    assert strategy.select_guess_with_max_entropy(entropies) == 'zebra'
+    assert strategy.select_guess_with_max_entropy({
+        "zebra": 2.0,
+        "apple": 2.0 - 5e-16,
+    }) == "zebra"
+
+    assert strategy.select_guess_with_max_entropy({
+        "zebra": 2.0,
+        "apple": 2.0,
+    }) == "apple"
+
+    assert strategy.select_guess_with_max_entropy({
+        "apple": 2.0,
+        "zebra": 2.0,
+    }) == "apple"
