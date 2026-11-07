@@ -1,9 +1,10 @@
 from .cli import WORDS_PATH, MAX_ATTEMPTS, read_words
 from .game import WordleGame, GameStatus
 from .solver import WordleSolver
-from .strategies import FrequencyStrategy, EntropyStrategy, Strategy
+from .strategies.strategy import Strategy
+from .strategies.frequency import FrequencyStrategy
+from .strategies.entropy import EntropyStrategy
 from time import perf_counter
-from math import log2
 from random import randint, seed, sample
 from dataclasses import dataclass
 
