@@ -4,7 +4,7 @@ from .solver import WordleSolver
 from .strategies import FrequencyStrategy, EntropyStrategy, Strategy
 from time import perf_counter
 from math import log2
-from random import randint
+from random import randint, seed, sample
 from dataclasses import dataclass
 
 TRIES_COUNT = 100
@@ -21,14 +21,14 @@ class BenchmarkResult:
     max_attempts: int
 
 
-def benchmark_loop(strategy: Strategy, tries_count: int, word_count: int, seeds: list[int]) -> BenchmarkResult:
+def benchmark_loop(strategy: Strategy, tries_count: int, word_count: int, seeds: list[int], words: list[str]) -> BenchmarkResult:
     (min_attempts, max_attempts) = (6, 0)
     (wins, failures) = (0, 0)
     total_attempts: list[float] = []
     decision_times: list[float] = []
     for i in range(tries_count):
         seed = seeds[i]
-        (game, solver) = init_game(word_count, seed)
+        (game, solver) = init_game(word_count, words, seed)
         answer: str = ''
         status: GameStatus = GameStatus.IN_PROGRESS
         for _ in range(MAX_ATTEMPTS):
@@ -59,13 +59,17 @@ def benchmark_loop(strategy: Strategy, tries_count: int, word_count: int, seeds:
 
     win_rate = wins / tries_count
     avg_decision_time = sum(decision_times) / len(decision_times)
-    avg_attempts = sum(total_attempts) / len(total_attempts)
+    if len(total_attempts) == 0:
+        avg_attempts = 0
+    else:
+        avg_attempts = sum(total_attempts) / len(total_attempts)
 
     return BenchmarkResult(win_rate, avg_attempts, failures, avg_decision_time, min_attempts, max_attempts)
 
 
-def init_game(word_count: int, seed: int) -> tuple[WordleGame, WordleSolver]:
-    allowed_words = read_words(WORDS_PATH, word_count)
+def init_game(word_count: int, words: list[str], seed: int) -> tuple[WordleGame, WordleSolver]:
+    allowed_words = pick_random_words(words, word_count)
+
     game = WordleGame(
         allowed_words, max_attempts=MAX_ATTEMPTS, rand_seed=seed)
     solver = WordleSolver(allowed_words)
@@ -73,13 +77,20 @@ def init_game(word_count: int, seed: int) -> tuple[WordleGame, WordleSolver]:
     return (game, solver)
 
 
+def pick_random_words(words: list[str], word_count: int) -> set[str]:
+    return set(sample(words, word_count))
+
+
 def winrate_benchmark():
     strategies = [FrequencyStrategy(), EntropyStrategy()]
+    seed(-1)
     seeds = [randint(1, 10000) for _ in range(TRIES_COUNT)]
+    words = list(read_words(WORDS_PATH))
     results: dict[Strategy, BenchmarkResult] = {}
     for strategy in strategies:
         start_time = perf_counter()
-        result = benchmark_loop(strategy, TRIES_COUNT, WORD_COUNT, seeds)
+        result = benchmark_loop(strategy, TRIES_COUNT,
+                                WORD_COUNT, seeds, words)
         end_time = perf_counter()
         results.update({strategy: result})
         print()
@@ -120,8 +131,8 @@ def time_benchmark():
 
 
 def main():
-    time_benchmark()
-    # winrate_benchmark()
+    # time_benchmark()
+    winrate_benchmark()
     # candidates = {
     #     "bobby",
     #     "bimbo",

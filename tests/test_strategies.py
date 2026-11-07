@@ -178,18 +178,27 @@ def test_entropy_antisymmetric():
     }
 
     strategy = EntropyStrategy()
-    
+
     assert strategy.select_guess(candidates) == 'passe'
+
+    assert pytest.approx(strategy.calculate_entropy(
+        'coops', candidates), rel=1e-5) == 1.921928
+    assert pytest.approx(strategy.calculate_entropy(
+        "elmer", candidates), rel=1e-5) == 1.921928
+    assert pytest.approx(strategy.calculate_entropy(
+        "passe", candidates), rel=1e-5) == 2.321928
+    assert pytest.approx(strategy.calculate_entropy(
+        "skied", candidates), rel=1e-5) == 2.321928
+    assert pytest.approx(strategy.calculate_entropy(
+        "spawn", candidates), rel=1e-5) == 2.321928
+
+
+def test_max_entropy():
+    entropies = {
+        "zebra": 2.00000,
+        "apple": 1.99999,
+    }
     
-    assert pytest.approx(strategy.calculate_entropy(
-                'coops', candidates), rel=1e-5) == 1.921928
-    assert pytest.approx(strategy.calculate_entropy(
-                "elmer", candidates), rel=1e-5) == 1.921928
-    assert pytest.approx(strategy.calculate_entropy(
-                "passe", candidates), rel=1e-5) == 2.321928
-    assert pytest.approx(strategy.calculate_entropy(
-                "skied", candidates), rel=1e-5) == 2.321928
-    assert pytest.approx(strategy.calculate_entropy(
-                "spawn", candidates), rel=1e-5) == 2.321928
-    
-    
+    strategy = EntropyStrategy()
+
+    assert strategy.select_guess_with_max_entropy(entropies) == 'zebra'

@@ -1,7 +1,6 @@
 from .feedback import validate, get_feedback
 from .solver import WordleSolver
-from math import log2
-from pytest import approx
+from math import log2, isclose
 from abc import ABC, abstractmethod
 
 
@@ -113,9 +112,6 @@ class EntropyStrategy(Strategy):
         if len(candidates) == 0:
             raise ValueError("Expected candidates to not be empty")
 
-        if guess not in candidates:
-            raise ValueError("Expected word to be in candidates")
-
         validate(guess)
         for candidate in candidates:
             validate(candidate)
@@ -168,6 +164,10 @@ class EntropyStrategy(Strategy):
 
         return feedbacks
 
+    @staticmethod
+    def are_almost_equal(a, b, rel_tol=1e-15, abs_tol=1e-15):
+        return isclose(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
+
     def select_guess(
         self,
         candidates: set[str],
@@ -180,12 +180,15 @@ class EntropyStrategy(Strategy):
 
         entropies = self.calculate_entropies(candidates)
 
-        max_pair = (list(candidates)[0], 0.0)
+        return self.select_guess_with_max_entropy(entropies)
+    
+    def select_guess_with_max_entropy(self, entropies: dict[str,float]) -> str:
+        max_pair = (list(entropies.keys())[0], 0.0)
 
         for (guess, entropy) in entropies.items():
             if entropy > max_pair[1]:
                 max_pair = (guess, entropy)
-            if approx(entropy, rel=1e-5) == approx(max_pair[1], rel=1e-5) and guess < max_pair[0]:
+            if EntropyStrategy.are_almost_equal(entropy, max_pair[1]) and guess < max_pair[0]:
                 max_pair = (guess, entropy)
 
         return max_pair[0]
