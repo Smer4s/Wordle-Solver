@@ -43,7 +43,6 @@ class ProbeEntropyStrategy(Strategy):
 
         if len(candidates) == 1:
             guess = next(iter(candidates))
-            print('max:', guess, 'as a single candidate')
             return guess
 
         entropyStrategy = EntropyStrategy()
@@ -62,7 +61,7 @@ class ProbeEntropyStrategy(Strategy):
         guess_entropy = entropies[guess]
 
         for (word, entropy) in entropies.items():
-            if (guess_entropy == entropy) and (guess not in candidates and word in candidates) or (guess in candidates and word in candidates and word < guess):
+            if (guess_entropy == entropy) and ((guess not in candidates and word in candidates) or (guess in candidates and word in candidates and word < guess)):
                 guess = word
                 guess_entropy = entropies[guess]
 

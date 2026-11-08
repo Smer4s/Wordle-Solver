@@ -65,12 +65,20 @@ def test_validation():
 
 
 def test_candidate_priority():
-    candidates = {"bight", "fight"}
+    candidates = {
+        "burrs", "fauna", "gaunt",
+        "hubba", "monos", "vials"
+    }
 
-    allowed_guesses = {
-        "aback", "bight", "fight"
+    allowed_guesses = candidates | {
+        "abbey", "abhor", "abode", "achoo",
+        "acmes", "acres", "acrid", "actor",
+        "adieu", "adios", "admix", "adobe",
+        "adopt", "aerie"
     }
     
     strategy = ProbeEntropyStrategy(allowed_guesses)
     
-    assert strategy.select_guess(candidates) == 'bight'
+    assert strategy.select_guess(candidates) == 'fauna'
+    
+

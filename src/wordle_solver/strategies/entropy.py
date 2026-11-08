@@ -81,7 +81,6 @@ class EntropyStrategy(Strategy):
         
         if len(candidates) == 1:
             guess = next(iter(candidates))
-            print('max:', guess, 'as a single candidate')
             return guess
 
         entropies = self.calculate_entropies(candidates)
