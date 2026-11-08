@@ -62,12 +62,8 @@ class ProbeEntropyStrategy(Strategy):
         guess_entropy = entropies[guess]
 
         for (word, entropy) in entropies.items():
-            if guess_entropy == entropy:
-                if (guess not in candidates and word in candidates):
-                    guess = word
-                    guess_entropy = entropies[guess]
-                if guess in candidates and word in candidates and word < guess:
-                    guess = word
-                    guess_entropy = entropies[guess]
+            if (guess_entropy == entropy) and (guess not in candidates and word in candidates) or (guess in candidates and word in candidates and word < guess):
+                guess = word
+                guess_entropy = entropies[guess]
 
         return guess
