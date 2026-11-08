@@ -76,6 +76,9 @@ class EntropyStrategy(Strategy):
         if len(candidates) == 0:
             raise ValueError("Expected candidates to not be empty")
         
+        for candidate in candidates:
+            validate(candidate)
+        
         if len(candidates) == 1:
             guess = next(iter(candidates))
             print('max:', guess, 'as a single candidate')
@@ -84,9 +87,6 @@ class EntropyStrategy(Strategy):
         entropies = self.calculate_entropies(candidates)
 
         guess = self.select_guess_with_max_entropy(entropies)
-        guess_entropy = entropies[guess]
-        print('max:', guess,  guess_entropy,
-              'candidates_len:', len(candidates))
         
         return guess
 

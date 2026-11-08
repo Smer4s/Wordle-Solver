@@ -36,6 +36,8 @@ class ProbeEntropyStrategy(Strategy):
         self,
         candidates: set[str],
     ) -> str:
+        if not candidates:
+            raise ValueError("Expected candidates to not be empty")
         if not candidates.issubset(self._allowed_guesses):
             raise ValueError("Expected candidates to be in allowed guesses")
 
@@ -58,12 +60,13 @@ class ProbeEntropyStrategy(Strategy):
         guess = entropyStrategy.select_guess_with_max_entropy(entropies)
 
         guess_entropy = entropies[guess]
-        print('max:', guess,  guess_entropy, 'is in candidates:', guess in candidates,
-              'candidates_len:', len(candidates))
 
         for (word, entropy) in entropies.items():
-            if entropy == guess_entropy and word in candidates:
-                if guess not in candidates and word < guess:
+            if guess_entropy == entropy:
+                if (guess not in candidates and word in candidates):
+                    guess = word
+                    guess_entropy = entropies[guess]
+                if guess in candidates and word in candidates and word < guess:
                     guess = word
                     guess_entropy = entropies[guess]
 

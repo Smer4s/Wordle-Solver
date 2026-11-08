@@ -56,6 +56,21 @@ def test_validation():
     candidates = {"bight"}
     allowed_guesses = {"turns"}
     strategy = ProbeEntropyStrategy(allowed_guesses)
-    
+
     with pytest.raises(ValueError):
         strategy.select_guess(candidates)
+    
+    with pytest.raises(ValueError):
+        strategy.select_guess(set())
+
+
+def test_candidate_priority():
+    candidates = {"bight", "fight"}
+
+    allowed_guesses = {
+        "aback", "bight", "fight"
+    }
+    
+    strategy = ProbeEntropyStrategy(allowed_guesses)
+    
+    assert strategy.select_guess(candidates) == 'bight'

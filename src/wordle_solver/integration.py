@@ -10,7 +10,7 @@ from random import randint, seed, sample
 from dataclasses import dataclass
 from math import fsum
 
-TRIES_COUNT = 10
+TRIES_COUNT = 25
 
 
 def pick_random_words(words: list[str], word_count: int) -> set[str]:
@@ -75,7 +75,7 @@ def game_test():
     probes_results: list[tuple[GameStatus, int]] = []
     for i in range(TRIES_COUNT):
         random_seed = randint(1, 1000)
-        print(f'Iteration #{i+1}:')
+        print(f'Iteration #{i+1}')
         random_words = pick_random_words(words, 1000)
         print()
         print('Started entropy game')
@@ -153,6 +153,16 @@ def init_game(words: set[str],) -> tuple[WordleGame, WordleSolver]:
 def main():
     # time_benchmark()
     game_test()
+    
+    # candidates = {"bight", "fight"}
+
+    # allowed_guesses = {
+    #     "aback", "bight", "fight"
+    # }
+    
+    # strategy = ProbeEntropyStrategy(allowed_guesses)
+    
+    # assert strategy.select_guess(candidates) == 'bight'
 
 
 if __name__ == "__main__":
