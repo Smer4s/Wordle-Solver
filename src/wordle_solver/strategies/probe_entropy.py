@@ -64,5 +64,5 @@ class ProbeEntropyStrategy(Strategy):
             if (guess_entropy == entropy) and ((guess not in candidates and word in candidates) or (guess in candidates and word in candidates and word < guess)):
                 guess = word
                 guess_entropy = entropies[guess]
-
+                
         return guess
