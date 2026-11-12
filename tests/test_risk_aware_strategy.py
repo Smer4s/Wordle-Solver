@@ -171,3 +171,19 @@ def test_property_testing():
     for (word, win_rate) in win_rates.items():
         assert strategy.calculate_win_probability(
             word, candidates, 2) == win_rate
+
+
+def test_correct_probability():
+    candidates = {
+        "colds", "curfs", "demos",
+        "phage", "remit", "waked"
+    }
+
+    allowed_guesses = candidates | {
+        "cubit", "emcee", "flunk", "fools",
+        "gaped", "ochre", "spits", "torso"
+    }
+
+    strategy = RiskAwareStrategy(allowed_guesses)
+    
+    assert strategy.select_guess(candidates, 2) == 'demos'

@@ -26,7 +26,7 @@ class RiskAwareStrategy(Strategy):
         self._validate_attempts(attempts_left)
         self._validate_candidates(candidates)
 
-        if len(candidates) == 1: 
+        if len(candidates) == 1:
             guess = next(iter(candidates))
             return guess
 
@@ -70,7 +70,7 @@ class RiskAwareStrategy(Strategy):
             return self._calculate_basic_win_probability(candidates, attempts_left)
 
         probs: set[tuple[str, float]] = set()
-        for guess in candidates:
+        for guess in self._allowed_guesses:
             probability = self._calculate_probability(candidates, guess)
             probs.add((guess, probability))
 
@@ -97,7 +97,7 @@ class RiskAwareStrategy(Strategy):
 
     def _pick_max_win_probability(self, candidates: set[str], attempts_left: int) -> str:
         probs = self._calculate_win_probabilities(
-            self._allowed_guesses, attempts_left)
+            candidates, attempts_left)
 
         (max_guess, max_prob) = next(iter(probs))
 
@@ -105,10 +105,10 @@ class RiskAwareStrategy(Strategy):
             replace = False
             if probability > max_prob:
                 replace = True
-            if probability == max_prob and guess in candidates:
-                replace = True
-            if guess in candidates == max_guess in candidates:
-                if guess < max_guess:
+            if probability == max_prob:
+                if guess in candidates and max_guess not in candidates:
+                    replace = True
+                if ((guess in candidates) == (max_guess in candidates)) and guess < max_guess:
                     replace = True
 
             if replace:
