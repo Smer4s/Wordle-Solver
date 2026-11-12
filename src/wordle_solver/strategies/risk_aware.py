@@ -63,16 +63,26 @@ class RiskAwareStrategy(Strategy):
 
     # Calculations
 
-    def _calculate_win_probabilities(self, candidates: set[str], attempts_left: int) -> set[tuple[str, float]]:
+    def _calculate_win_probabilities(
+        self,
+        candidates: set[str],
+        attempts_left: int
+    ) -> dict[str, float]:
         self._validate_attempts(attempts_left, 2)
 
-        if attempts_left == 1:
-            return self._calculate_basic_win_probability(candidates, attempts_left)
+        probs = {}
 
-        probs: set[tuple[str, float]] = set()
         for guess in self._allowed_guesses:
-            probability = self._calculate_probability(candidates, guess)
-            probs.add((guess, probability))
+            if attempts_left == 1:
+                probability = self._calculate_basic_win_probability(
+                    candidates, attempts_left, guess
+                )
+            else:
+                probability = self._calculate_probability(
+                    candidates, guess
+                )
+
+            probs[guess] = probability
 
         return probs
 
@@ -99,9 +109,9 @@ class RiskAwareStrategy(Strategy):
         probs = self._calculate_win_probabilities(
             candidates, attempts_left)
 
-        (max_guess, max_prob) = next(iter(probs))
+        (max_guess, max_prob) = next(iter(probs.items()))
 
-        for (guess, probability) in probs:
+        for (guess, probability) in probs.items():
             replace = False
             if probability > max_prob:
                 replace = True

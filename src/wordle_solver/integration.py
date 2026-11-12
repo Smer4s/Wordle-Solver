@@ -22,7 +22,7 @@ def game_test():
     words = list(sorted(read_words(WORDS_PATH)))
     word_counts = [5, 10, 20, 50]
     seed(-1)
-    allowed_words = pick_random_words(words, 5)
+    allowed_words = pick_random_words(words, 100)
 
     candidates_list: list[set[str]] = [
         pick_random_words(list(allowed_words), count) for count in word_counts]
