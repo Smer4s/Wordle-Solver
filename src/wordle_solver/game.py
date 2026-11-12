@@ -27,7 +27,8 @@ class WordleGame:
     def __init__(
             self,
             allowed_words: set[str],
-            max_attempts: int = 6) -> None:
+            max_attempts: int = 6,
+            answer: str | None = None) -> None:
         if type(max_attempts) is not int:
             raise ValueError(f'Expected type of max_attempts to be int, but got: {type(max_attempts)}')
         if max_attempts <= 0:
@@ -39,8 +40,12 @@ class WordleGame:
         for word in allowed_words:
             validate(word)
         self._allowed_words = allowed_words.copy()
-
-        answer = choice(list(self._allowed_words))
+        if answer is None:
+            answer = choice(sorted(self._allowed_words))
+        else:
+            answer = normalize(answer)
+            if answer not in self._allowed_words:
+                raise ValueError("Answer must be in allowed_words")
         self._answer = answer
         self._status = GameStatus.IN_PROGRESS
         self._history: list[GuessResult] = []

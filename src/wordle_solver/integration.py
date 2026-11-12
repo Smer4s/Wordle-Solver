@@ -25,7 +25,7 @@ def game_test():
     allowed_words = pick_random_words(words, 100)
 
     candidates_list: list[set[str]] = [
-        pick_random_words(list(allowed_words), count) for count in word_counts]
+        pick_random_words(sorted(allowed_words), count) for count in word_counts]
 
     print(f'Allowed Words: {allowed_words}\n')
 
